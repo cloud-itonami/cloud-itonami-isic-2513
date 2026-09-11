@@ -30,7 +30,7 @@
       linkage stays legible on the page.
 
   This scenario is authored here rather than reusing `steamgenmfg.sim`
-  verbatim: sim was run first (`clojure -M:dev:run`) to confirm the real
+  verbatim: sim was run first (`kbb -M:dev:run`) to confirm the real
   ledger output, then this scenario was written to cover ALL TWELVE
   governor rules plus a rejected human approval, and to keep each
   seeded batch's own last ledger fact meaningful.
@@ -39,7 +39,7 @@
   dates on the page come from seed data or from the scenario's own
   request values. Two consecutive runs are byte-identical.
 
-  Usage: `clojure -M:dev:render-html [out-file]`
+  Usage: `kbb -M:dev:render-html [out-file]`
   (default `docs/samples/operator-console.html`)."
   (:require [clojure.java.io :as io]
             [kotoba.lang.text :as str]
@@ -385,7 +385,7 @@
      "  <h1>Manufacture of steam generators (ISIC 2513) &mdash; Operator Console</h1>\n"
      "</header>\n"
      "<p><span class=\"badge\">read-only sample</span> <span class=\"badge\">governor-gated</span> <span class=\"badge\">maintenance &amp; shipment always human-approved</span></p>\n"
-     "<p class=\"subtitle\">Generated at build time by <code>steamgenmfg.render-html</code> (<code>clojure -M:dev:render-html</code>) by running the real "
+     "<p class=\"subtitle\">Generated at build time by <code>steamgenmfg.render-html</code> (<code>kbb -M:dev:render-html</code>) by running the real "
      "<code>steamgenmfg.operation</code> actor &rarr; <code>steamgenmfg.governor</code> &rarr; <code>steamgenmfg.store</code> stack over the seeded plant. "
      "Every value below was read back out of the store after that run; nothing is transcribed by hand. "
      "This run produced <span class=\"num\">" (count ledger) "</span> ledger facts, of which <span class=\"num\">"
