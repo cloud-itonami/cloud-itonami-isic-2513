@@ -1,0 +1,44 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:dev:physics` runs it.
+;;
+;; The README has no "Robotics premise" section; its Scope names the plant
+;; this actor coordinates (ISIC 2513): fabricating, welding, assembling and
+;; hydrotesting fire-tube, water-tube and waste-heat boilers and HRSGs. The
+;; physical work of that plant taken here: post-weld heat treatment of a
+;; thick steam drum in the furnace, the tensile check of a coupon from an
+;; incoming boiler-tube lot, and the tube-handling robot feeding tubes to
+;; the bending machine.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isic-2513"
+ :cases
+ [{:id :drum-pwht-soak
+   :kind :thermal
+   :procedure "steam drum shell in the PWHT furnace at 620 C, heated from both faces (half the wall, mid-wall adiabatic), loaded at 300 C: time for mid-wall to reach the 595 C soak temperature"
+   :params {:thickness-m 0.05 :conductivity-w-mk 38.0 :density-kg-m3 7850.0 :specific-heat-j-kgk 600.0
+            :t0-c 300.0 :t-hot-c 620.0 :h-front-w-m2k 60.0 :h-back-w-m2k 0.0
+            :threshold-c 595.0 :duration-s 36000.0 :nodes 11}
+   :sweep {:param :thickness-m :values [0.025 0.05 0.075 0.10 0.125]}
+   :quantity :time-to-threshold-s
+   :limit {:max 7200.0 :basis "estimate: 2 h allowed for the mid-wall to come up to soak temperature in the furnace schedule"}
+   :boundary {:lo 0.01 :hi 0.25}}
+  {:id :boiler-tube-coupon
+   :kind :material
+   :procedure "QC robot pulls a strip coupon (4 mm x 20 mm, 100 mm gauge) cut from an incoming carbon-steel boiler-tube lot to 40 kN; the 0.2 % offset yield force is judged; sweep = the lot's yield stress"
+   :params {:length-m 0.10 :area-m2 8.0e-5 :youngs-modulus-pa 205.0e9 :hardening-pa 1.0e9
+            :density-kg-m3 7850.0 :max-force-n 40000.0}
+   :sweep {:param :yield-stress-pa :values [160.0e6 175.0e6 185.0e6 200.0e6 240.0e6]}
+   :quantity :yield-force-n
+   :limit {:min 14800.0 :basis "estimate: a 185 MPa minimum yield assumed for the tube grade on the purchase order (185 x 80 mm2 = 14800 N)"}
+   :boundary {:lo 140.0e6 :hi 260.0e6}}
+  {:id :tube-to-bender
+   :kind :manipulator
+   :procedure "tube-handling arm lifts a straight boiler tube from the rack and feeds it into the bending machine's clamp"
+   :params {:l1-m 0.80 :l2-m 0.70 :m1-kg 18.0 :m2-kg 12.0
+            :from [1.00 0.20] :to [0.60 0.80] :duration-s 3.0 :steps 500}
+   :sweep {:param :payload-kg :values [10.0 20.0 30.0 45.0 60.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 800.0 :basis "estimate: continuous shoulder torque of a ~60 kg-payload industrial arm class"}
+   :boundary {:lo 1.0 :hi 150.0}}]}
